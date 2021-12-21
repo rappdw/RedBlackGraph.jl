@@ -28,7 +28,7 @@ I will also examine several applications of RedBlackGraphs to illustrate the uti
 for familial relationships.
 
 ## Formal Definition
-A RedBlackGraph is a network, ``\mathscr{N}``, consiting of a directed graph, ``G = (V,E)``, and a relationship 
+A RedBlackGraph is a network, ``\mathscr{N}``, consisting of a directed graph, ``G = (V,E)``, and a relationship 
 function, ``r(\mathbf{u},\mathbf{v})\rightarrow \{\mathbb{A}\}``. Where:
 
 1. ``\mathbb{A}``, avos numbers, are: ``\mathbb{N} \cup \{0, {\color{red}1}\}`` ``\text{where: }\begin{cases} {\color{red}1} \lt 1, \\ {\color{red}1} \text{ is even}, \\ \text{otherwise  }{\color{red}1} \text{ behaves as }1 \end{cases}``
@@ -47,29 +47,29 @@ The relationships resulting from sexual reproduction can be modeled by a RedBlac
 vertices that are male as Red and vertices that are female as Black with direction of edges being from the offspring 
 to the parent. 
 
-$(PlutoUI.LocalResource("img/simple-graph.png"))
+![simple-graph](../assets/img/simple-graph.png)
 
 
 ## Observation
-For a given vertex in a RedBlackGraph there are two distinct sub-graphs or "views" or perspectives, for a given vertex: Descendency and Ancestry. 
+For a given vertex in a RedBlackGraph there are two distinct sub-graphs or "views" or perspectives, for a given vertex: Descendancy and Ancestry. 
 
-**Descendency** is the sub-graph for a given vertex that consists of all vertices and edges that can follow a graph traversal and arrive at the given node.
+**Descendancy** is the sub-graph for a given vertex that consists of all vertices and edges that can follow a graph traversal and arrive at the given node.
 
-$(PlutoUI.LocalResource("img/simple-graph-descendency.png"))
+![simple-graph-descendancy](../assets/img/simple-graph-descendancy.png)
 
 **Ancestry** is the sub-graph for a given vertex that consists of all the vertices and edges reachable by following out-bound edges. This sub-graph is a well-formed binary tree. 
 
-$(PlutoUI.LocalResource("img/simple-graph-ancestry.png"))
+![simple-graph-ancestry](../assets/img/simple-graph-ancestry.png)
 
-The Ancestry sub-graph from a given ``\mathbf{u}`` is a well-formed binary tree. ``r(\mathbf{u},\mathbf{v})`` is defined as to number the nodes of the tree as they are encountered in a breadth first search. An concrete example of ``r(\mathbf{u},\mathbf{v})`` is observed in a pedigree chart (common in family history research). See fig. Pedigree Chart. 
+The Ancestry sub-graph from a given ``\mathbf{u}`` is a well-formed binary tree. ``r(\mathbf{u},\mathbf{v})`` is defined as to number the nodes of the tree as they are encountered in a breadth first search. A concrete example of ``r(\mathbf{u},\mathbf{v})`` is observed in a pedigree chart (common in family history research). See fig. Pedigree Chart. 
 
-$(PlutoUI.LocalResource("img/pedigree-1.png"))
+![pedigree](../assets/img/pedigree-1.png)
 
 ## Adjacency Matrix
 
 An adjacency matrix is a square matrix used to represent a graph. The elements of the matrix are 1 (or edge weight) if there is an edge between the vertices represented by the column index and the row index. Slightly more formally, for ``G`` with a vertex set ``V``, the adjacency matrix is a square ``|V|`` x ``|V|`` matrix, ``A`` such that ``A_{ij}`` is ``1`` if there exists an edge from ``\mathbf{i}`` to ``\mathbf{j}`` and ``0`` otherwise.
 
-Given the above example graph and chosing indices for the vertices as follows: 0 - Female Offspring, 1 - Male Offspring, 2 - Male Progenitor, 3 - Female Progenitor, the graph would be represented by the following adjacency matrix.
+Given the above example graph and choosing indices for the vertices as follows: 0 - Female Offspring, 1 - Male Offspring, 2 - Male Progenitor, 3 - Female Progenitor, the graph would be represented by the following adjacency matrix.
 
 $$A = \begin{bmatrix}
 0 & 0 & 1 & 1 \\
@@ -80,7 +80,7 @@ $$A = \begin{bmatrix}
 
 ## RedBlackGraph Adjacency Matrix
 
-Let's define the adjacency matrix for a RedBlackGraph only slightly differently. ``R_{ij}=r(\mathbf{i}, \mathbf{j})`` if there is an relationship from ``\mathbf{i}`` to ``\mathbf{j}`` and ``0`` otherwise. The following is the RedBlackGraph adjacency matrix for the above example graph.
+Let's define the adjacency matrix for a RedBlackGraph only slightly differently. ``R_{ij}=r(\mathbf{i}, \mathbf{j})`` if there is a relationship from ``\mathbf{i}`` to ``\mathbf{j}`` and ``0`` otherwise. The following is the RedBlackGraph adjacency matrix for the above example graph.
 
 $$R = \begin{bmatrix}
 1 & 0 & 2 & 3 \\
@@ -103,11 +103,11 @@ Observe the following properties:
 
 Computing the transitive closure of an adjacency matrix, ``A``, results in the reachability a matrix, ``A^+``, that shows all vertices that are reachable from any given vertex. If ``A_{ij} == 1`` there is a path from ``\mathbf{v}_i`` to ``\mathbf{v}_j``.
 
-The transitive closure of a RedBlackGraph adjacency matrix, ``R``, is defined to be the relationship matrix, ``R^+``. In addition to reachability, ``R^+`` is defined in such that if ``R^+_{ij} == \mathbf{n}`` and ``\mathbf{n}`` is non-zero, then from ``\mathbf{n}`` we can derive both the path lengh and the explicit traversal path from ``\mathbf{i}`` to ``\mathbf{j}``.
+The transitive closure of a RedBlackGraph adjacency matrix, ``R``, is defined to be the relationship matrix, ``R^+``. In addition to reachability, ``R^+`` is defined in such that if ``R^+_{ij} == \mathbf{n}`` and ``\mathbf{n}`` is non-zero, then from ``\mathbf{n}`` we can derive both the path length and the explicit traversal path from ``\mathbf{i}`` to ``\mathbf{j}``.
 
 As an example consider the following graph, where each node has been labeled with a vertex index:
 
-$(PlutoUI.LocalResource("img/simple-graph-transitive-closure.png"))
+![simple-graph-transitive-closure](../assets/img/simple-graph-transitive-closure.png)
 
 By inspection:
 
@@ -129,7 +129,7 @@ Before examining how to generate ``R^+`` from ``R``, consider the following obse
 
 * ``r(\mathbf{u},\mathbf{v})`` is even when ``\mathbf{v}`` is red and odd when black. (By convention ``{\color{red}1}`` is considered even.)
 * The path length is inherent in ``r(\mathbf{u},\mathbf{v})``, and is trivially derived by taking the integral portion of ``log_{2}(r(\mathbf{u},\mathbf{v}))``.
-* The traversal path is also inherent in ``r(\mathbf{u},\mathbf{v})`` and can be derived by reversing ``r``'s defintion and successively right shifting out bits (of a ``base_2`` integer representation) and using that bit to "walk" the traversal edge to a red vertex or black vertex.
+* The traversal path is also inherent in ``r(\mathbf{u},\mathbf{v})`` and can be derived by reversing ``r``'s definition and successively right shifting out bits (of a ``base_2`` integer representation) and using that bit to "walk" the traversal edge to a red vertex or black vertex.
 * The diameter of ``R^+`` is given by ``log_{2}(max(r(\mathbf{u},\mathbf{v})))``.
 
 ## RedBlack Arithmetic
@@ -140,18 +140,18 @@ As constructing ``R^+`` by inspection is cumbersome for non-trivial cases, let's
 
 The first step requires defining a transitive relationship function. To illustrate,  consider 3 vertices: ``\mathbf{u}``, ``\mathbf{v}`` and ``\mathbf{w}``. Further, assume that there is a path from ``\mathbf{u}`` to ``\mathbf{v}`` and from ``\mathbf{v}`` to ``\mathbf{w}``. I'll define the function, ``f(r(\mathbf{u},\mathbf{v}),r(\mathbf{v},\mathbf{w}))\rightarrow r(\mathbf{u},\mathbf{w})``, as the *avos product* and designate it using ``⨰``, e.g. ``r(\mathbf{u},\mathbf{w})=r(\mathbf{u},\mathbf{v}) ⨰ r(\mathbf{v},\mathbf{w})``.
 
-If ``r(\mathbf{u},\mathbf{v})=4`` (``\mathbf{v}`` is ``\mathbf{u}``'s paternal grandfather) and ``r(\mathbf{v},\mathbf{w})=7`` (``\mathbf{w}`` is ``\mathbf{v}``'s maternal grandmother). Using either the defintion of ``r`` or transcribing ``\mathbf{v}``'s pedigree into the proper place in ``\mathbf{u}``'s pedigree chart we see that ``r(\mathbf{u},\mathbf{w})=19``, or ``19 = 4 ⨰ 7``. To further explore this consider the following (``r(\mathbf{x},\mathbf{y})`` represented in base-2 for illustrative purposes):
+If ``r(\mathbf{u},\mathbf{v})=4`` (``\mathbf{v}`` is ``\mathbf{u}``'s paternal grandfather) and ``r(\mathbf{v},\mathbf{w})=7`` (``\mathbf{w}`` is ``\mathbf{v}``'s maternal grandmother). Using either the definition of ``r`` or transcribing ``\mathbf{v}``'s pedigree into the proper place in ``\mathbf{u}``'s pedigree chart we see that ``r(\mathbf{u},\mathbf{w})=19``, or ``19 = 4 ⨰ 7``. To further explore this, consider the following (``r(\mathbf{x},\mathbf{y})`` represented in base-2 for illustrative purposes):
 
-| ``\mathbf{v}``'s relationship to ``\mathbf{u}``  | ``\mathbf{w}``'s relationship to ``\mathbf{v}`` | ``r(\mathbf{u},\mathbf{v})`` | ``r(\mathbf{v},\mathbf{w})`` | ``r(\mathbf{u},\mathbf{w})`` |
-| ---------------------- | --------------------- | --------- | -------- | --------- |
-| father                 | father                | 10        | 10       | 100       |
-| father                 | mother                | 10        | 11       | 101       |
-| mother                 | father                | 11        | 10       | 110       |
-| mother                 | mother                | 11        | 11       | 111       |
-| father                 | paternal grandfather  | 10        | 100      | 1000      |
-| maternal grandmother   | paternal grandfather  | 111       | 100      | 11100     |
+| ``\mathbf{v}``'s relationship to ``\mathbf{u}`` | ``\mathbf{w}``'s relationship to ``\mathbf{v}`` | ``r(\mathbf{u},\mathbf{v})`` | ``r(\mathbf{v},\mathbf{w})`` | ``r(\mathbf{u},\mathbf{w})`` |
+|-------------------------------------------------|-------------------------------------------------|------------------------------|------------------------------|------------------------------|
+| father                                          | father                                          | 10                           | 10                           | 100                          |
+| father                                          | mother                                          | 10                           | 11                           | 101                          |
+| mother                                          | father                                          | 11                           | 10                           | 110                          |
+| mother                                          | mother                                          | 11                           | 11                           | 111                          |
+| father                                          | paternal grandfather                            | 10                           | 100                          | 1000                         |
+| maternal grandmother                            | paternal grandfather                            | 111                          | 100                          | 11100                        |
 
-To complete the definiton of the Avos Product, the following conventions are imposed:
+To complete the definition of the Avos Product, the following conventions are imposed:
 1. ``{\color{red}1} = {\color{red}1} ⨰ 1``
 2. ``{\color{red}1} = 1 ⨰ {\color{red}1}``
 3. For all other cases, ``{\color{red}1}`` is treated as ``1``
@@ -160,7 +160,7 @@ To complete the definiton of the Avos Product, the following conventions are imp
 
 It is natural to pair multiplication with addition for linear algebra operations (matrix multiplication, matrix distance product, etc.) a min-avos product pairing conforms to the definition of RedBlackGraphs with a slight modification required for implementation in a typical RAM computer, namely ``{\color{red}1}=2^\mathbf{w}-1``, where ``\mathbf{w}`` is the word size of the numeric type. Aside from ``{\color{red}1}``, the range of ``r(\mathbf{u},\mathbf{v})`` is ``\mathbb{N}``. It is therefore, natural to utilize unsigned numeric types to represent avos numbers. Additionally, assume the convention ``min(0)=\infty``. The min function needs to be aware of both these conventions. These conventions define ``avos sum`` which is designated by ``\dotplus``, e.g. ``{\color{red}1} = {\color{red}1} \dotplus 5`` and ``2 = 37 \dotplus 2`` and ``3 = 0 \dotplus 3``.
 
-To complete the definiton of the Avos Sum, the following conventions are imposed:
+To complete the definition of the Avos Sum, the following conventions are imposed:
 1. ``{\color{red}1} = {\color{red}1} \dotplus 1``
 2. ``{\color{red}1} = 1 \dotplus {\color{red}1}``
 3. For all other cases, ``{\color{red}1}`` is treated as ``1``

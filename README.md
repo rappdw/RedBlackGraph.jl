@@ -2,7 +2,7 @@
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://rappdw.github.io/RedBlackGraph.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://rappdw.github.io/RedBlackGraph.jl/dev)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/rappdw/RedBlackGraph.jl?svg=true)](https://ci.appveyor.com/project/rappdw/RedBlackGraph-jl)
+[![Build Status](https://ci.appveyor.com/api/projects/status/7f3nqx8oq02pdewy/branch/main?svg=true)](https://ci.appveyor.com/project/rappdw/redblackgraph-jl/branch/main)
 [![Coverage](https://codecov.io/gh/rappdw/RedBlackGraph.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/rappdw/RedBlackGraph.jl)
 
 ## Introduction

@@ -1,6 +1,6 @@
 # RedBlackGraph.jl - A DAG of Multiple, Interleaved Binary Trees
 
-[![Documentation](https://github.com/rappdw/RedBlackGraph.jl/actions/workflows/documentation.yml/badge.svg)](https://github.com/rappdw/RedBlackGraph.jl/actions/workflows/Documentation.yml)
+[![Documentation](https://github.com/rappdw/RedBlackGraph.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/rappdw/RedBlackGraph.jl/actions/workflows/Documentation.yml)
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://rappdw.github.io/RedBlackGraph.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://rappdw.github.io/RedBlackGraph.jl/dev)
 [![Build Status](https://ci.appveyor.com/api/projects/status/7f3nqx8oq02pdewy/branch/main?svg=true)](https://ci.appveyor.com/project/rappdw/redblackgraph-jl/branch/main)

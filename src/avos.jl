@@ -1,10 +1,12 @@
 import Base: unsigned, Unsigned, UInt8, UInt16, UInt32, UInt64, UInt128, show, typemax, typemin, <, +, *, -, one, zero, convert, promote_rule, promote_typeof
-"""
-    AInteger
+@doc raw"""
+    AInteger (or Avos Integer)
 
-    Integers that follow Avos definition for addition and multiplication
-    also introduces a secondary value of 1, red one, which is greater than zero and less than
-    one.
+Integers that follow Avos definition for addition and multiplication. AIntegers also have
+a distinct integer, ``\color{red}1``, where:
+* ``0 < {\color{red}1} < 1``
+* iseven(``{\color{red}1}``) == true
+
 """
 abstract type AInteger <: Unsigned end
 primitive type AInt8 <: AInteger 8 end
@@ -72,12 +74,12 @@ promote_rule(::Type{AInt64}, ::Union{Type{Int64}, Type{UInt64}}) = AInt64
 promote_rule(::Type{AInt128}, ::Union{Type{Int128}, Type{UInt128}}) = AInt128
 
 
-"""
+@doc raw"""
     red_one(x)
     red_one(T::type)
 
-Return a avos "red one" for `x`: a value such that
-`red_one(x)+one(x) == red_one(x)`.
+Return a ``\color{red}1`` for `x`: a value such that
+``{\color{red}1} + 1 == {\color{red}1}``.
 """
 function red_one(::AInteger) end
 
@@ -119,10 +121,10 @@ unsigned(x::AInt32) = x % UInt32
 unsigned(x::AInt64) = x % UInt64
 unsigned(x::AInt128) = x % UInt128
 
-"""
+@doc raw"""
     <(x::Integer, y::Integer)
 
-for comparison purpose, 0 compares as ∞ and red_one(::T{AInteger}) is the least value of any
+for comparison purpose, 0 compares as ∞ and ``\color{red}1`` is the least value of any
 AInteger
 """
 function <(x::AInteger, y::AInteger)
@@ -142,7 +144,7 @@ end
 """
     +(x::Integer, y::Integer)
 
-Avos Sum or min of x, y where min(0) == ∞.
+Avos Sum or min(x, y) where min(0) == ∞.
 """
 function +(x::AInteger, y::AInteger)
     x < y ? x : y

@@ -47,7 +47,7 @@ The relationships resulting from sexual reproduction can be modeled by a RedBlac
 vertices that are male as Red and vertices that are female as Black with direction of edges being from the offspring 
 to the parent. 
 
-![simple-graph](../assets/img/simple-graph.png)
+![simple-graph](./assets/img/simple-graph.png)
 
 
 ## Observation
@@ -55,15 +55,15 @@ For a given vertex in a RedBlackGraph there are two distinct sub-graphs or "view
 
 **Descendancy** is the sub-graph for a given vertex that consists of all vertices and edges that can follow a graph traversal and arrive at the given node.
 
-![simple-graph-descendancy](../assets/img/simple-graph-descendancy.png)
+![simple-graph-descendancy](./assets/img/simple-graph-descendancy.png)
 
 **Ancestry** is the sub-graph for a given vertex that consists of all the vertices and edges reachable by following out-bound edges. This sub-graph is a well-formed binary tree. 
 
-![simple-graph-ancestry](../assets/img/simple-graph-ancestry.png)
+![simple-graph-ancestry](./assets/img/simple-graph-ancestry.png)
 
 The Ancestry sub-graph from a given ``\mathbf{u}`` is a well-formed binary tree. ``r(\mathbf{u},\mathbf{v})`` is defined as to number the nodes of the tree as they are encountered in a breadth first search. A concrete example of ``r(\mathbf{u},\mathbf{v})`` is observed in a pedigree chart (common in family history research). See fig. Pedigree Chart. 
 
-![pedigree](../assets/img/pedigree-1.png)
+![pedigree](./assets/img/pedigree-1.png)
 
 ## Adjacency Matrix
 
@@ -107,7 +107,7 @@ The transitive closure of a RedBlackGraph adjacency matrix, ``R``, is defined to
 
 As an example consider the following graph, where each node has been labeled with a vertex index:
 
-![simple-graph-transitive-closure](../assets/img/simple-graph-transitive-closure.png)
+![simple-graph-transitive-closure](./assets/img/simple-graph-transitive-closure.png)
 
 By inspection:
 

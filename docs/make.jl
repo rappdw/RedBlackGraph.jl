@@ -19,6 +19,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/rappdw/RedBlackGraph.jl",
+    repo="github.com/rappdw/RedBlackGraph.jl.git",
     devbranch="main",
 )

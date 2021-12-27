@@ -76,7 +76,8 @@ deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[RedBlackGraph]]
-path = ".."
+deps = ["Documenter", "Test"]
+path = "/Users/drapp/dev/.julia/dev/RedBlackGraph"
 uuid = "e907e2e1-757b-491a-891c-4da3128a909a"
 version = "0.1.0"
 

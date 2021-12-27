@@ -19,15 +19,17 @@ function test_basic_properties(T::Type)
     @test eins < zip
     @test r1 < zip
     @test r1 < eins
-#    @test !(eins < r1)
 
     @test zip > r1
     @test zip > eins
     @test eins > r1
-#    @test !(eins > r1)
 
     second_r1 = red_one(eins)
     @test second_r1 == r1
+
+    @test iseven(r1)
+    @test !iseven(eins)
+    @test iseven(zip)
 end
 
 function test_basic_avos_sum(T1::Type, T2::Type)

@@ -1,4 +1,4 @@
-import Base: unsigned, Unsigned, UInt8, UInt16, UInt32, UInt64, UInt128, show, typemax, typemin, <, +, *, -, one, zero, convert, promote_rule, promote_typeof
+import Base: unsigned, Unsigned, UInt8, UInt16, UInt32, UInt64, UInt128, show, typemax, typemin, <, <=, +, *, one, zero, convert, promote_rule, promote_typeof, iseven
 @doc raw"""
     AInteger (or Avos Integer)
 
@@ -121,8 +121,14 @@ unsigned(x::AInt32) = x % UInt32
 unsigned(x::AInt64) = x % UInt64
 unsigned(x::AInt128) = x % UInt128
 
+function string(x::AInteger)
+    s = IOBuffer()
+    _print(s, x, unsigned(x))
+    String(take!(s))
+end
+
 @doc raw"""
-    <(x::Integer, y::Integer)
+    <(x::AInteger, y::AInteger)
 
 for comparison purpose, 0 compares as ∞ and ``\color{red}1`` is the least value of any
 AInteger
@@ -141,10 +147,33 @@ function <(x::AInteger, y::AInteger)
     end
 end
 
+function <=(x::AInteger, y::AInteger)
+    T = promote_typeof(x, y)
+    xT, yT = x % T, y % T
+    xu, yu = unsigned(xT), unsigned(yT)
+
+    if xu == yu
+        return true
+    elseif yu == 0 || xu == typemax(xu)
+        return true
+    else
+        return xu <= yu
+    end
+end
+
+@doc raw"""
+    iseven(x::AInteger) -> Bool
+
+Return `true` if `x` is even (that is, divisible by 2) or ``\color{red}1``, and `false` otherwise.
+
+# Examples
 """
+iseven(n::AInteger) = n == red_one(n) || iseven(unsigned(n))
+
+@doc raw"""
     +(x::Integer, y::Integer)
 
-Avos Sum or min(x, y) where min(0) == ∞.
+Avos Sum or min(x, y) where min(0) == ∞ and ``{\color{red}1} < 1``.
 """
 function +(x::AInteger, y::AInteger)
     x < y ? x : y

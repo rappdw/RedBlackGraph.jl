@@ -43,7 +43,11 @@ representation of how the two individuals are related.
 
 """
 function lookup_relationship(da::Integer, db::Integer)
-    removal = abs(da - db)
+    if da > db
+        removal = da - db
+    else
+        removal = db - da
+    end
     if da == 0 && db == 0
         return "self"
     elseif da == 0 || db == 0
@@ -78,12 +82,23 @@ function lookup_relationship(da::Integer, db::Integer)
 end
 
 function lookup_relationship(r::Relationship)
-    return lookup_relationship(MSB(r.a_to_ancestor), MSB(r.b_to_ancestor))
+    a = r.a_to_ancestor
+    b = r.b_to_ancestor
+    if a == red_one(a)
+        a = one(a)
+    end
+    if b == red_one(b)
+        b = one(b)
+    end
+    if a == 0 || b == 0
+        return "No Relationship"
+    end
+    return lookup_relationship(MSB(a), MSB(b))
 end
 
 function calculate_relationship(a::Vector{T}, b::Vector{T}) where T <: AInteger
     common_ancestor = 0
-    closest_relationship = (0, 0)
+    closest_relationship = (T(0), T(0))
     individual_a = 0
     individual_b = 0
     for (index, value) in enumerate(zip(a, b))

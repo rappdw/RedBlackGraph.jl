@@ -179,6 +179,7 @@ function +(x::AInteger, y::AInteger)
     x < y ? x : y
 end
 
+MSB(n::AInteger) = MSB(unsigned(n))
 MSB(n::Integer) = typeof(n)(sizeof(n)<<3 - leading_zeros(n) - (1))
 
 """

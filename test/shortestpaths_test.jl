@@ -19,7 +19,19 @@ function test_floyd_warshall(T::Type)
 	0 0 0 r 0;
 	2 4 5 8 1
 	]
+	@test M == [
+	r 2 3 0 0;
+	0 r 0 2 0;
+	0 0 1 0 0;
+	0 0 0 r 0;
+	2 0 0 0 1
+	]
 	@test W == W_expected
+
+	W = floyd_warshall_transitive_closure!(M)
+	@test M == W_expected
+	@test W == W_expected
+
 end
 
 

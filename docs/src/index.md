@@ -28,7 +28,7 @@ I will provide a formal definition of a RedBlackGraph, as well as explore a numb
 will also examine several applications of RedBlackGraphs to illustrate the utility of using this mathematical model for
 familial relationships.
 
-## Formal Definition
+### Formal Definition
 
 A RedBlackGraph is a network, ``\mathscr{N}``, consisting of a directed graph, ``G = (V,E)``, and a relationship
 function, ``r(\mathbf{u},\mathbf{v})\rightarrow \{\mathbb{A}\}``. Where:
@@ -49,7 +49,7 @@ function, ``r(\mathbf{u},\mathbf{v})\rightarrow \{\mathbb{A}\}``. Where:
        is bitwise shift left)
     3. repeat step two until ``\mathbf{v}`` is reached
 
-## Motivation
+### Motivation
 
 The relationships resulting from sexual reproduction can be modeled by a RedBlackGraph, arbitrarily assigning vertices
 that are male as Red and vertices that are female as Black with direction of edges being from the offspring to the
@@ -57,7 +57,7 @@ parent.
 
 ![simple-graph](./assets/img/simple-graph.png)
 
-## Observation
+### Observation
 
 For a given vertex in a RedBlackGraph there are two distinct sub-graphs or "views" or perspectives, for a given vertex:
 Descendancy and Ancestry.
@@ -79,7 +79,7 @@ Chart.
 
 ![pedigree](./assets/img/pedigree-1.png)
 
-## Adjacency Matrix
+### Adjacency Matrix
 
 An adjacency matrix is a square matrix used to represent a graph. The elements of the matrix are 1 (or edge weight) if
 there is an edge between the vertices represented by the column index and the row index. Slightly more formally,
@@ -91,7 +91,7 @@ Offspring, 2 - Male Progenitor, 3 - Female Progenitor, the graph would be repres
 
 $$A = \begin{bmatrix} 0 & 0 & 1 & 1 \\ 0 & 0 & 1 & 1 \\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 \\ \end{bmatrix}$$
 
-## RedBlackGraph Adjacency Matrix
+### RedBlackGraph Adjacency Matrix
 
 Let's define the adjacency matrix for a RedBlackGraph only slightly differently. ``R_{ij}=r(\mathbf{i}, \mathbf{j})`` if
 there is a relationship from ``\mathbf{i}`` to ``\mathbf{j}`` and ``0`` otherwise. The following is the RedBlackGraph
@@ -110,7 +110,7 @@ Observe the following properties:
 
 ``|V_{red}| = \frac{|V| - trace(R)}{2}``
 
-## Transitive Closure
+### Transitive Closure
 
 Computing the transitive closure of an adjacency matrix, ``A``, results in the reachability a matrix, ``A^+``, that
 shows all vertices that are reachable from any given vertex. If ``A_{ij} == 1`` there is a path from ``\mathbf{v}_i``
@@ -143,12 +143,12 @@ Before examining how to generate ``R^+`` from ``R``, consider the following obse
   traversal edge to a red vertex or black vertex.
 * The diameter of ``R^+`` is given by ``log_{2}(max(r(\mathbf{u},\mathbf{v})))``.
 
-## RedBlack Arithmetic
+### RedBlack Arithmetic
 
 As constructing ``R^+`` by inspection is cumbersome for non-trivial cases, let's explore a method to algorithmically
 derive ``R^+`` from ``R``.
 
-### Transitive Relationship Function or Avos Product
+#### Transitive Relationship Function or Avos Product
 
 The first step requires defining a transitive relationship function. To illustrate, consider 3 vertices: ``\mathbf{u}``
 , ``\mathbf{v}`` and ``\mathbf{w}``. Further, assume that there is a path from ``\mathbf{u}`` to ``\mathbf{v}`` and
@@ -178,7 +178,7 @@ To complete the definition of the Avos Product, the following conventions are im
 2. ``{\color{red}1} = 1 ⨰ {\color{red}1}``
 3. For all other cases, ``{\color{red}1}`` is treated as ``1``
 
-### Avos Sum
+#### Avos Sum
 
 It is natural to pair multiplication with addition for linear algebra operations (matrix multiplication, matrix distance
 product, etc.) a min-avos product pairing conforms to the definition of RedBlackGraphs with a slight modification
@@ -195,7 +195,47 @@ To complete the definition of the Avos Sum, the following conventions are impose
 2. ``{\color{red}1} = 1 \dotplus {\color{red}1}``
 3. For all other cases, ``{\color{red}1}`` is treated as ``1``
 
-## Transitive Closure for RedBlackGraph Adjacency Matrix
+### Transitive Closure for RedBlackGraph Adjacency Matrix
+Transitive closure of an adjacency matrix can be computed a number of ways, a simple approach is the 
+[Floyd-Warshall Algorithm](https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm).
+
+Summarized, this algorithm is a tripple loop across the matrix indices continuously updating the current transitive 
+relationship, ``A^+_{i,j}``, if there is a relationship from ``A_{i,k}`` and a relationship from ``A_{k,j}``. With the 
+definition of avos number product and sum in the previous section, applying the Floyd-Warshall 
+algorithm to a matrix of avos numbers results in the transitive closure, ``R^+``. The example of ``R^+`` above that
+was derived from inspection can now be computed by applying `floyd_warshall_transitive_closure` to the initial
+state, ``R``.
+
+Observe the following properties of ``R^+``:
+* row vectors represent the complete ancestry view for a given vertex
+* column vectors represent the complete descendancy view for a given vertex
+* row vectors representing siblings are nearly identical (they are independent due to every vertex having an edge to 
+itself)
+* determining whether ``\mathbf{v}`` is an ancestor of ``\mathbf{u}``, as well as the lineage path, is 
+``\mathcal{O}(1)`` and provided by ``R^+[u,v]``
+
+### Applications of ``R^+``
+
+#### Determining Ancestry and Lineage Path between ``\mathbf{v}`` and ``\mathbf{u}``
+As noted in the observations above, this is a simple lookup in ``R^+``. The resultant relationship value can be
+deconstructed (by reversing the shortest path walk described in the formal definition) to provide the lineage path.
+
+#### Calculating Relationship Between Two Rows in ``R^+``
+
+With ``R^+`` there exists an efficient way to determining full kinship (see: 
+[consanguinity](https://en.wikipedia.org/wiki/Consanguinity)) between any two vertices. 
+
+1. Given two row vectors from ``R^+``, ``\vec u`` and ``\vec v``, find the minimum of ``\vec u_{i} + \vec v_{i}`` where 
+both ``\vec u_{i}`` and ``\vec v_{i}`` are non-zero. This yields values, ``r(\mathbf{u},\mathbf{i})`` and 
+``$r(\mathbf{v},\mathbf{i})`` expressing the relationship of ``\mathbf{u}`` and ``\mathbf{v}`` to the nearest common 
+ancestor, ``\mathbf{i_{min}}``
+2. Determine the path length from ``\mathbf u`` and ``\mathbf v`` to the common ancestor, 
+``log_2(r(\mathbf{u},\mathbf{i}))`` and ``log_2(r(\mathbf{v},\mathbf{i}))``.
+3. Using a Table of Consanguinity, calculate the relationship
+
+Determining whether ``\mathbf{u}`` is related to ``\mathbf{v}`` is ``\mathcal{O}(m)`` where ``m`` is the expected 
+number of ancestors and ``m << |V|`` (assuming an efficient sparse matrix representation). Empirically, ``m`` is on 
+the order of ``log_2(|V|)``.
 
 
 ## Documentation

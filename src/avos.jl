@@ -84,8 +84,8 @@ Return a ``\color{red}1`` for `x`: a value such that
 function red_one(::AInteger) end
 
 # now define min, max and red_one for each width of AInteger
-typemin(::Type{AInt8 }) = AInt8(0)
-typemax(::Type{AInt8 }) = AInt8(254)
+typemin(::Type{AInt8}) = AInt8(0)
+typemax(::Type{AInt8}) = AInt8(254)
 red_one(::AInt8) = AInt8(255)
 red_one(::Type{AInt8}) = AInt8(255)
 red_one(x::Int8) = red_one(AInt8(x))

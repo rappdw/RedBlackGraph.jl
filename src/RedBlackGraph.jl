@@ -1,11 +1,11 @@
 module RedBlackGraph
 
-include("avos.jl")
+include("avus.jl")
 include("shortestpaths/floyd-warshall.jl")
 include("relationship.jl")
 
 export
-# Base number system
+# Avus number system
 red_one, AInteger, AInt8, AInt16, AInt32, AInt64, AInt128, MSB,
 
 # Shortest Path / Transitive Closure

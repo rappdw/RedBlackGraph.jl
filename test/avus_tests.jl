@@ -32,13 +32,13 @@ function test_basic_properties(T::Type)
     @test iseven(zip)
 end
 
-function test_basic_avos_sum(T1::Type, T2::Type)
+function test_basic_avus_sum(T1::Type, T2::Type)
     @test T1(0) + T2(1) == T2(1)
     @test T1(1) + T2(1) == T1(1)
     @test T1(1) + T2(2) == T1(1)
 end
 
-function test_basic_avos_product(T1::Type, T2::Type)
+function test_basic_avus_product(T1::Type, T2::Type)
     @test T1(0) * T2(1) == 0
     @test T1(1) * T2(1) == 1
     @test T1(1) * T2(2) == 2
@@ -50,22 +50,22 @@ end
 
 
 
-@testset "Basic Avos Tests" begin
+@testset "Basic Avus Tests" begin
     test_basic_properties(AInt8)
     test_basic_properties(AInt16)
     test_basic_properties(AInt32)
     test_basic_properties(AInt64)
     test_basic_properties(AInt128)
 
-    test_basic_avos_sum(AInt8, AInt8)
-    test_basic_avos_sum(AInt16, AInt16)
-    test_basic_avos_sum(AInt32, AInt32)
-    test_basic_avos_sum(AInt64, AInt64)
-    test_basic_avos_sum(AInt128, AInt128)
+    test_basic_avus_sum(AInt8, AInt8)
+    test_basic_avus_sum(AInt16, AInt16)
+    test_basic_avus_sum(AInt32, AInt32)
+    test_basic_avus_sum(AInt64, AInt64)
+    test_basic_avus_sum(AInt128, AInt128)
 
-    test_basic_avos_product(AInt8, AInt8)
-    test_basic_avos_product(AInt16, AInt16)
-    test_basic_avos_product(AInt32, AInt32)
-    test_basic_avos_product(AInt64, AInt64)
-    test_basic_avos_product(AInt128, AInt128)
+    test_basic_avus_product(AInt8, AInt8)
+    test_basic_avus_product(AInt16, AInt16)
+    test_basic_avus_product(AInt32, AInt32)
+    test_basic_avus_product(AInt64, AInt64)
+    test_basic_avus_product(AInt128, AInt128)
 end

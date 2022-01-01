@@ -1,6 +1,6 @@
 name = "RedBlackGraph"
 uuid = "e907e2e1-757b-491a-891c-4da3128a909a"
-authors = ["Dan Rapp"]
+authors = ["Dan Rapp <rappdw@gmail.com>"]
 version = "0.1.0"
 
 [deps]

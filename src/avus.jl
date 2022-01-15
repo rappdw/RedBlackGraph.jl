@@ -39,11 +39,11 @@ UInt128(x::AInt128) = reinterpret(UInt128, x)
 
 function _print(io::IO, x::AInteger, y::Unsigned)
     if y == 0
-        printstyled(io, "0"; color = :bold)
+        printstyled(io, "0"; color = :black)
     elseif x == red_one(x)
         printstyled(io, "1"; color = :red)
     else
-        printstyled(io, Base.dec(y, 0, false); color = :bold)
+        printstyled(io, Base.dec(y, 0, false); color = :black)
     end
 end
 

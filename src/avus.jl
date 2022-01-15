@@ -1,8 +1,8 @@
-import Base: unsigned, Unsigned, UInt8, UInt16, UInt32, UInt64, UInt128, show, typemax, typemin, <, +, *, -, one, zero, convert, promote_rule, promote_typeof
+import Base: unsigned, Unsigned, UInt8, UInt16, UInt32, UInt64, UInt128, show, typemax, typemin, <, <=, +, *, one, zero, convert, promote_rule, promote_typeof, iseven
 @doc raw"""
-    AInteger (or Avos Integer)
+    AInteger (or Avus Integer)
 
-Integers that follow Avos definition for addition and multiplication. AIntegers also have
+Integers that follow Avus definition for addition and multiplication. AIntegers also have
 a distinct integer, ``\color{red}1``, where:
 * ``0 < {\color{red}1} < 1``
 * iseven(``{\color{red}1}``) == true
@@ -66,7 +66,7 @@ promote_rule(::Type{Int32}, ::Union{Type{AInt16}, Type{AInt8}}) = AInt32
 promote_rule(::Type{Int64}, ::Union{Type{AInt16}, Type{AInt32}, Type{AInt8}}) = AInt64
 promote_rule(::Type{Int128}, ::Union{Type{AInt16}, Type{AInt32}, Type{AInt64}, Type{AInt8}}) = AInt128
 
-# with mixed signed/unsigned/avos and same size, Avos wins
+# with mixed signed/unsigned/Avus and same size, Avus wins
 promote_rule(::Type{AInt8}, ::Union{Type{Int8}, Type{UInt8}}) = AInt8
 promote_rule(::Type{AInt16}, ::Union{Type{Int16}, Type{UInt16}}) = AInt16
 promote_rule(::Type{AInt32}, ::Union{Type{Int32}, Type{UInt32}}) = AInt32
@@ -84,8 +84,8 @@ Return a ``\color{red}1`` for `x`: a value such that
 function red_one(::AInteger) end
 
 # now define min, max and red_one for each width of AInteger
-typemin(::Type{AInt8 }) = AInt8(0)
-typemax(::Type{AInt8 }) = AInt8(254)
+typemin(::Type{AInt8}) = AInt8(0)
+typemax(::Type{AInt8}) = AInt8(254)
 red_one(::AInt8) = AInt8(255)
 red_one(::Type{AInt8}) = AInt8(255)
 red_one(x::Int8) = red_one(AInt8(x))
@@ -121,8 +121,14 @@ unsigned(x::AInt32) = x % UInt32
 unsigned(x::AInt64) = x % UInt64
 unsigned(x::AInt128) = x % UInt128
 
+function string(x::AInteger)
+    s = IOBuffer()
+    _print(s, x, unsigned(x))
+    String(take!(s))
+end
+
 @doc raw"""
-    <(x::Integer, y::Integer)
+    <(x::AInteger, y::AInteger)
 
 for comparison purpose, 0 compares as ∞ and ``\color{red}1`` is the least value of any
 AInteger
@@ -141,29 +147,53 @@ function <(x::AInteger, y::AInteger)
     end
 end
 
+function <=(x::AInteger, y::AInteger)
+    T = promote_typeof(x, y)
+    xT, yT = x % T, y % T
+    xu, yu = unsigned(xT), unsigned(yT)
+
+    if xu == yu
+        return true
+    elseif yu == 0 || xu == typemax(xu)
+        return true
+    else
+        return xu <= yu
+    end
+end
+
+@doc raw"""
+    iseven(x::AInteger) -> Bool
+
+Return `true` if `x` is even (that is, divisible by 2) or ``\color{red}1``, and `false` otherwise.
+
+# Examples
 """
+iseven(n::AInteger) = n == red_one(n) || iseven(unsigned(n))
+
+@doc raw"""
     +(x::Integer, y::Integer)
 
-Avos Sum or min(x, y) where min(0) == ∞.
+Avus Sum or min(x, y) where min(0) == ∞ and ``{\color{red}1} < 1``.
 """
 function +(x::AInteger, y::AInteger)
     x < y ? x : y
 end
 
+MSB(n::AInteger) = MSB(unsigned(n))
 MSB(n::Integer) = typeof(n)(sizeof(n)<<3 - leading_zeros(n) - (1))
 
 """
     *(x::Integer, y::Integer)
 
-Avos Product or transitive relationship function.
+Avus Product or transitive relationship function.
 
 Consider 3 vertices: u, v and w. Furthermore, assume that there is a path from u to v,
 represented as x, and from v to w, represented as y.
 
-The Avos Product provides the path from u to w, represented as z, e.g. z = x ⨰ y
+The Avus Product provides the path from u to w, represented as z, e.g. z = x ⨰ y
 """
 function *(x::AInteger, y::AInteger)
-    # the implementation of the avos product simply replaces the left most significant bit
+    # the implementation of the Avus product simply replaces the left most significant bit
     # of arg2 with the arg1
 
     T = promote_typeof(x, y)

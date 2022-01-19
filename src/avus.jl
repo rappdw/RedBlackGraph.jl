@@ -1,4 +1,8 @@
-import Base: unsigned, Unsigned, UInt8, UInt16, UInt32, UInt64, UInt128, show, typemax, typemin, <, <=, +, *, one, zero, convert, promote_rule, promote_typeof, iseven
+import Base: 
+    unsigned, Unsigned, UInt8, UInt16, UInt32, UInt64, UInt128, 
+    Int8, Int16, Int32, Int64, Int128,
+    show, typemax, typemin, <, <=, +, *, one, zero, convert, promote_rule, promote_typeof, iseven
+
 @doc raw"""
     AInteger (or Avus Integer)
 
@@ -36,6 +40,26 @@ UInt128(x::AInt16) = UInt128(reinterpret(UInt16, x))
 UInt128(x::AInt32) = UInt128(reinterpret(UInt32, x))
 UInt128(x::AInt64) = UInt128(reinterpret(UInt64, x))
 UInt128(x::AInt128) = reinterpret(UInt128, x)
+
+# needed because some of the alogrithms in Graphs don't distinguish the type of 
+# the vertex and the type of the edges. A RedBlackGraph represents vertices as 
+# Unsgined and edges as AInteger. Generally, conversion from AInteger to Integer
+# shouldn't be done.
+Int8(x::AInt8) = reinterpret(Int8, x)
+Int16(x::AInt8) = Int16(reinterpret(Int8, x))
+Int16(x::AInt16) = reinterpret(Int16, x)
+Int32(x::AInt8) = Int32(reinterpret(Int8, x))
+Int32(x::AInt16) = Int32(reinterpret(Int16, x))
+Int32(x::AInt32) = reinterpret(Int32, x)
+Int64(x::AInt8) = Int64(reinterpret(Int8, x))
+Int64(x::AInt16) = Int64(reinterpret(Int16, x))
+Int64(x::AInt32) = Int64(reinterpret(Int32, x))
+Int64(x::AInt64) = reinterpret(Int64, x)
+Int128(x::AInt8) = Int128(reinterpret(Int8, x))
+Int128(x::AInt16) = Int128(reinterpret(Int16, x))
+Int128(x::AInt32) = Int128(reinterpret(Int32, x))
+Int128(x::AInt64) = Int128(reinterpret(Int64, x))
+Int128(x::AInt128) = reinterpret(Int128, x)
 
 function _print(io::IO, x::AInteger, y::Unsigned)
     if y == 0
@@ -142,6 +166,8 @@ function <(x::AInteger, y::AInteger)
         return false
     elseif yu == 0 || xu == typemax(xu)
         return true
+    elseif yu == typemax(yu)
+        return false
     else
         return xu < yu
     end
@@ -156,6 +182,8 @@ function <=(x::AInteger, y::AInteger)
         return true
     elseif yu == 0 || xu == typemax(xu)
         return true
+    elseif yu == typemax(yu)
+        return false
     else
         return xu <= yu
     end

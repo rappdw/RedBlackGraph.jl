@@ -11,7 +11,7 @@ export
 red_one, AInteger, AInt8, AInt16, AInt32, AInt64, AInt128, MSB,
 
 # RBGraph
-RBGraph,
+RBGraph, permute,
 
 # Shortest Path / Transitive Closure
 floyd_warshall_transitive_closure, floyd_warshall_transitive_closure!,

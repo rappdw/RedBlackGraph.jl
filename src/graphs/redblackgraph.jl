@@ -21,9 +21,11 @@ abstract type AbstractRBGraph{T<:AInteger} <: AbstractGraph{T}end
 """
     RBGraph{T}
 
-A type representing a RBGraph.
+A type representing a RedBlackGraph. 
 """
 mutable struct RBGraph{T <: AInteger} <: AbstractRBGraph{T}
+     # RBGraphs are sparse (<< upper triangular), so representing the graph as a connectivity matrix is 
+     # very inefficient, but it provides for a simple implementation
     graph::Matrix{T}
     ne::Int
 
@@ -91,129 +93,6 @@ function rem_edge!(g::RBGraph{T}, e::SimpleEdge) where T<:AInteger
     return false
 end
 
-# TODO: just copied from SimpleDiGraph
-
-# function add_vertex!(g::SimpleDiGraph{T}) where T
-#     (nv(g) + one(T) <= nv(g)) && return false       # test for overflow
-#     push!(g.badjlist, Vector{T}())
-#     push!(g.fadjlist, Vector{T}())
-
-#     return true
-# end
-
-# function rem_vertices!(g::SimpleDiGraph{T},
-#                        vs::AbstractVector{<: Integer};
-#                        keep_order::Bool=false
-#                       ) where {T <: Integer}
-#     # check the implementation in simplegraph.jl for more comments
-
-#     n = nv(g)
-#     isempty(vs) && return collect(Base.OneTo(n))
-
-#     # Sort and filter the vertices that we want to remove
-#     remove = sort(vs)
-#     unique!(remove)
-#     (1 <= remove[1] && remove[end] <= n) ||
-#             throw(ArgumentError("Vertices to be removed must be in the range 1:nv(g)."))
-
-#     # Create a vmap that maps vertices to their new position
-#     # vertices that get removed are mapped to 0
-#     vmap = Vector{T}(undef, n)
-#     if keep_order
-#         # traverse the vertex list and shift if a vertex gets removed
-#         i = 1
-#         @inbounds for u in vertices(g)
-#             if i <= length(remove) && u == remove[i]
-#                 vmap[u] = 0
-#                 i += 1
-#             else
-#                 vmap[u] = u - (i - 1)
-#             end
-#         end
-#     else
-#         # traverse the vertex list and replace vertices that get removed 
-#         # with the furthest one to the back that does not get removed
-#         i = 1
-#         j = length(remove)
-#         v = n
-#         @inbounds for u in vertices(g)
-#             u > v && break
-#             if i <= length(remove) && u == remove[i]
-#                 while v == remove[j] && v > u
-#                    vmap[v] = 0
-#                    v -= one(T)
-#                    j -= 1
-#                 end
-#                 # v > remove[j] || u == v
-#                 vmap[v] = u
-#                 vmap[u] = 0
-#                 v -= one(T)
-#                 i += 1
-#             else
-#                 vmap[u] = u
-#             end
-#         end
-#     end
-
-#     fadjlist = g.fadjlist
-#     badjlist = g.badjlist
-
-#     # count the number of edges that will be removed
-#     num_removed_edges = 0
-#     @inbounds for u in remove
-#         for v in fadjlist[u]
-#             num_removed_edges += 1
-#         end
-#         for v in badjlist[u]
-#             if vmap[v] != 0
-#                 num_removed_edges += 1
-#             end
-#         end
-#     end
-#     g.ne -= num_removed_edges
-
-#     # move the lists in the adjacency list to their new position
-#     # order of traversing is important!
-#     @inbounds for u in (keep_order ? (one(T):1:n) : (n:-1:one(T)))
-#         if vmap[u] != 0
-#             fadjlist[vmap[u]] = fadjlist[u]
-#             badjlist[vmap[u]] = badjlist[u]
-#         end
-#     end
-#     resize!(fadjlist, n - length(remove))
-#     resize!(badjlist, n - length(remove))
-
-#     # remove vertices from the lists in fadjlist and badjlist
-#     @inbounds for list_of_lists in (fadjlist, badjlist)
-#         for list in list_of_lists
-#             Δ = 0
-#             for (i, v) in enumerate(list)
-#                 if vmap[v] == 0
-#                     Δ += 1
-#                 else
-#                     list[i - Δ] = vmap[v]
-#                 end
-#             end
-#             resize!(list, length(list) - Δ)
-#             if !keep_order
-#                 sort!(list)
-#             end
-#         end
-#     end
-
-#     # we create a reverse vmap, that maps vertices in the result graph
-#     # to the ones in the original graph. This resembles the output of
-#     # induced_subgraph
-#     reverse_vmap = Vector{T}(undef, nv(g))
-#     @inbounds for (i, u) in enumerate(vmap)
-#         if u != 0
-#             reverse_vmap[u] = i
-#         end
-#     end
-
-#     return reverse_vmap
-# end
-
 function _is_edge(x::AInteger)
     return x > 1 && x < 0
 end
@@ -265,4 +144,33 @@ function all_neighbors(g::RBGraph{T}, u::Integer) where T<:AInteger
     end
     resize!(union_nbrs, indx-1)
     return union_nbrs
+end
+
+"""
+    permute(g::RBGraph{T}, p::Vector{U}; upper_triangular=false) where T<:AInteger where U<:Integer
+
+Permutes the vertices of the graph, g, as specified by the permutation vector, p. If the graph is 
+represented by an upper triangular matrix, then upper_triangular can be set to `true` to optimize
+the computation.
+
+An example usage is:
+```
+using Graphs
+using RedBlackGraph
+
+g = RBGraph(...)
+p = topological_sort_by_dfs(g)
+g′ = permute(g, p) # g′ will be an upper triangular matrix with the "youngest" vertex in the first position, end the "oldest" in the last
+```
+"""
+function permute(g::RBGraph{T}, p::Vector{U}; upper_triangular=false) where T<:AInteger where U<:Integer
+    n = nv(g)
+    g′ = zeros(T, n, n)
+    for i in 1:n
+        start = upper_triangular ? i : 1
+        for j in start:n
+            g′[i, j] = g.graph[p[i], p[j]]
+        end
+    end
+    return g′
 end

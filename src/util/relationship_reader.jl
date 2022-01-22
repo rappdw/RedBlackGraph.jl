@@ -4,20 +4,26 @@ using FilePathsBase: /
 """
     read_graph(dir::String, name::String, sparse_size_threshold = 10000)
 
-    A utility to parse input csv files into a RedBlackGraph. The first argument is the directory that holds the csv files.
-    The second is the basename for the csv files. By convention, there are two csv files <basename>.canonical.edges.csv and 
-    <basename>.canonical.vertices.csv. 
+    A utility to parse input csv files into a RedBlackGraph. The first argument 
+    is the directory that holds the csv files. The second is the basename for the 
+    csv files. By convention, there are two csv files <basename>.canonical.edges.csv 
+    and <basename>.canonical.vertices.csv. 
     
-    <basename>.canonical.edges.csv may have more than two columns, but the first two are significant for these utilities.
-    Column 1 is the source vetex number, Column 2 is the destination vertex number.
+    <basename>.canonical.edges.csv may have more than two columns, but the first two 
+    are significant for these utilities. Column 1 is the source vetex number, Column 2 
+    is the destination vertex number.
 
-    <basename>.canonical.vertices.csv may have more than 2 columns, but two are significant for these utilites. It must contain
-    a Column labeled "vertex_number" and one labeled "color". Both columns contain integers.
+    <basename>.canonical.vertices.csv may have more than 2 columns, but two are 
+    significant for these utilites. It must contain a Column labeled "vertex_number" 
+    and one labeled "color". Both columns contain integers.
 
-    This utility will return either a Matrix{AInt64} or a SparseMatrixCSC{AInt64, Int64} if the number of vertices in the graph
-    is greater than the value of sparse_size_threshold.
+    This utility will return either a Matrix{AInt64} or a SparseMatrixCSC{AInt64, Int64} 
+    if the number of vertices in the graph is greater than the value of 
+    sparse_size_threshold.
 
-    (Note: https://github.com/rappdw/fs-crawler can be used to generate the required csv files.)
+    # Note
+    https://github.com/rappdw/fs-crawler can be used to generate the required 
+    input csv files.
 """
 function read_graph(dir::String, name::String, sparse_size_threshold = 10000)
     dir = Path(dir)

@@ -383,9 +383,15 @@ A simple implementation of triangularizing $R$ based on the properties inherent 
 
 ![Graph with Components (Canonical Form)](./assets/img/canonical.png)
 
+## Module Index
+```@index
+Modules = [RedBlackGraph]
+Order   = [:constant, :type, :function, :macro]
+```
 
-## Documentation
+## Detailed API
 
 ```@autodocs
 Modules = [RedBlackGraph]
+Order   = [:constant, :type, :function, :macro]
 ```

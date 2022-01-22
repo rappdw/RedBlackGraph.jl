@@ -153,14 +153,16 @@ Permutes the vertices of the graph, g, as specified by the permutation vector, p
 represented by an upper triangular matrix, then upper_triangular can be set to `true` to optimize
 the computation.
 
-An example usage is:
-```
+# Examples
+```julia
 using Graphs
 using RedBlackGraph
 
 g = RBGraph(...)
 p = topological_sort_by_dfs(g)
-g′ = permute(g, p) # g′ will be an upper triangular matrix with the "youngest" vertex in the first position, end the "oldest" in the last
+g′ = permute(g, p) 
+# g′ will be an upper triangular matrix with the "youngest" vertex in the first position, 
+# and the "oldest" vertex in the last position
 ```
 """
 function permute(g::RBGraph{T}, p::Vector{U}; upper_triangular=false) where T<:AInteger where U<:Integer

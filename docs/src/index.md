@@ -7,9 +7,6 @@ CurrentModule = RedBlackGraph
 Documentation for [RedBlackGraph](https://github.com/rappdw/RedBlackGraph.jl). RedBlackGraphs are DAGs of interleaved
 Binary Trees.
 
-```@index
-```
-
 ## Introduction
 
 When representing binary relationships, such as familial relationships, a number of approaches may be utilized

@@ -16,7 +16,7 @@ function throw_if_invalid_eltype(T::Type{<:AInteger})
     end
 end
 
-abstract type AbstractRBGraph{T<:AInteger} <: AbstractGraph{T}end
+abstract type AbstractRBGraph{T<:AInteger} <: AbstractGraph{T} end
 
 """
     RBGraph{T}
@@ -94,18 +94,18 @@ function rem_edge!(g::RBGraph{T}, e::SimpleEdge) where T<:AInteger
 end
 
 function _is_edge(x::AInteger)
-    return x > 1 && x < 0
+    return x > 1 && x != 0
 end
 
 function inneighbors(g::RBGraph{T}, v::Integer) where T<:AInteger
-    if v < size(g.graph, 1)
+    if v <= size(g.graph, 1)
         return @inbounds findall(_is_edge, g.graph[:, v])
     end
     return []
 end
 
 function outneighbors(g::RBGraph{T}, v::Integer) where T<:AInteger
-    if v < size(g.graph, 1)
+    if v <= size(g.graph, 1)
         return @inbounds findall(_is_edge, g.graph[v, :])
     end
     return []

@@ -1,7 +1,10 @@
 import Base: 
     unsigned, Unsigned, UInt8, UInt16, UInt32, UInt64, UInt128, 
-    Int8, Int16, Int32, Int64, Int128,
-    show, typemax, typemin, <, <=, +, *, one, zero, convert, promote_rule, promote_typeof, iseven
+    Int8, Int16, Int32, Int64, Int128, <, <=, ==,
+    show, typemax, typemin, +, *, hash, hash_uint64, hash_integer, 
+    div, one, zero, 
+    convert, promote_rule, promote_typeof, iseven,
+    trailing_zeros, >>, <<, >>>, BitSigned, BitUnsigned
 
 @doc raw"""
     AInteger (or Avus Integer)
@@ -18,6 +21,21 @@ primitive type AInt16 <: AInteger 16 end
 primitive type AInt32 <: AInteger 32 end
 primitive type AInt64 <: AInteger 64 end
 primitive type AInt128 <: AInteger 128 end
+
+# The tuples and types that do not include 128 bit sizes are necessary to handle
+# certain issues on 32-bit machines, and also to simplify promotion rules, as
+# they are also used elsewhere where Int128/UInt128 support is separated out,
+# such as in hashing2.jl
+
+const BitAInteger32_types      = (AInt8, AInt16, AInt32)
+const BitAInteger64_types      = (BitAInteger32_types..., AInt64)
+const BitAInteger_types        = (BitAInteger64_types..., AInt128)
+const BitAIntegerSmall_types   = Int === Int64 ? ( AInt8,  AInt16,  AInt32) : ( AInt8,  AInt16)
+const BitAInteger32      = Union{BitAInteger32_types...}
+const BitAInteger64      = Union{BitAInteger64_types...}
+const BitAInteger        = Union{BitAInteger_types...}
+const BitAIntegerSmall   = Union{BitAIntegerSmall_types...}
+const BitAInteger64T     = Union{Type{AInt8}, Type{AInt16}, Type{AInt32}, Type{AInt64}}
 
 AInt8(x::Integer) = reinterpret(AInt8, convert(UInt8, x))
 AInt16(x::Integer) = reinterpret(AInt16, convert(UInt16, x))
@@ -61,6 +79,29 @@ Int128(x::AInt32) = Int128(reinterpret(Int32, x))
 Int128(x::AInt64) = Int128(reinterpret(Int64, x))
 Int128(x::AInt128) = reinterpret(Int128, x)
 
+# 'trailing_zeros', '>>', 'div', and 'hash' are need to be able to place AInteger as keys into Dict
+trailing_zeros(x::AInt8) = trailing_zeros(reinterpret(Int8, x))
+trailing_zeros(x::AInt16) = trailing_zeros(reinterpret(Int16, x))
+trailing_zeros(x::AInt32) = trailing_zeros(reinterpret(Int32, x))
+trailing_zeros(x::AInt64) = trailing_zeros(reinterpret(Int64, x))
+# trailing_zeros(x::AInt128) = trailing_zeros(reinterpret(Int128, x))
+
+>>(x::BitAInteger,  y::BitUnsigned) = >>(unsigned(x), y)
+<<(x::BitAInteger,  y::BitUnsigned) = <<(unsigned(x), y)
+>>>(x::BitAInteger, y::BitUnsigned) = >>>(unsigned(x), y)
+
+function div(x::AInteger, y::AInteger)
+    T = promote_typeof(x, y)
+    xT, yT = x % T, y % T
+    xu, yu = unsigned(xT), unsigned(yT)
+    return div(xu, yu)
+end
+
+hash(x::AInt64, h::UInt) = hash_uint64(reinterpret(UInt64, x)) - 3h
+hash(x::Union{AInt8,AInt16,AInt32}, h::UInt) = hash(Int64(x), h)
+hash(x::AInt128, h::UInt) = hash_integer(reinterpret(UInt128, x), h)
+
+
 function _print(io::IO, x::AInteger, y::Unsigned)
     if y == 0
         printstyled(io, "0"; color = :black)
@@ -89,6 +130,11 @@ promote_rule(::Type{Int16}, ::Type{AInt8}) = AInt16
 promote_rule(::Type{Int32}, ::Union{Type{AInt16}, Type{AInt8}}) = AInt32
 promote_rule(::Type{Int64}, ::Union{Type{AInt16}, Type{AInt32}, Type{AInt8}}) = AInt64
 promote_rule(::Type{Int128}, ::Union{Type{AInt16}, Type{AInt32}, Type{AInt64}, Type{AInt8}}) = AInt128
+
+promote_rule(::Type{UInt16}, ::Type{AInt8}) = AInt16
+promote_rule(::Type{UInt32}, ::Union{Type{AInt16}, Type{AInt8}}) = AInt32
+promote_rule(::Type{UInt64}, ::Union{Type{AInt16}, Type{AInt32}, Type{AInt8}}) = AInt64
+promote_rule(::Type{UInt128}, ::Union{Type{AInt16}, Type{AInt32}, Type{AInt64}, Type{AInt8}}) = AInt128
 
 # with mixed signed/unsigned/Avus and same size, Avus wins
 promote_rule(::Type{AInt8}, ::Union{Type{Int8}, Type{UInt8}}) = AInt8
@@ -152,12 +198,12 @@ function string(x::AInteger)
 end
 
 @doc raw"""
-    <(x::AInteger, y::AInteger)
+    ⧀(x::AInteger, y::AInteger)
 
-for comparison purpose, 0 compares as ∞ and ``\color{red}1`` is the least value of any
-AInteger
+for avus comparison purposes, 0 compares as ∞ and ``\color{red}1`` is the least 
+value of any AInteger
 """
-function <(x::AInteger, y::AInteger)
+function ⧀(x::AInteger, y::AInteger)
     T = promote_typeof(x, y)
     xT, yT = x % T, y % T
     xu, yu = unsigned(xT), unsigned(yT)
@@ -173,20 +219,55 @@ function <(x::AInteger, y::AInteger)
     end
 end
 
+@doc raw"""
+    <(x::AInteger, y::AInteger)
+
+for comparison purposes 0 < ``\color{red}1`` < 1
+"""
+function <(x::AInteger, y::AInteger)
+    if x === red_one(x)
+        return true
+    elseif y === red_one(y)
+        return false
+    else
+        T = promote_typeof(x, y)
+        xT, yT = x % T, y % T
+        xu, yu = unsigned(xT), unsigned(yT)
+
+        if xu == yu
+            return false
+        else
+            return xu < yu
+        end
+    end
+end
+
 function <=(x::AInteger, y::AInteger)
+    if x === red_one(x)
+        return true
+    elseif y === red_one(y)
+        return false
+    else
+        T = promote_typeof(x, y)
+        xT, yT = x % T, y % T
+        xu, yu = unsigned(xT), unsigned(yT)
+
+        if xu == yu
+            return true
+        else
+            return xu <= yu
+        end
+    end
+end
+
+function ==(x::AInteger, y::AInteger)
+    if x === red_one(x) && y === red_one(y)
+        return true
+    end
     T = promote_typeof(x, y)
     xT, yT = x % T, y % T
     xu, yu = unsigned(xT), unsigned(yT)
-
-    if xu == yu
-        return true
-    elseif yu == 0 || xu == typemax(xu)
-        return true
-    elseif yu == typemax(yu)
-        return false
-    else
-        return xu <= yu
-    end
+    return xu == yu
 end
 
 @doc raw"""
@@ -204,7 +285,7 @@ iseven(n::AInteger) = n == red_one(n) || iseven(unsigned(n))
 Avus Sum or min(x, y) where min(0) == ∞ and ``{\color{red}1} < 1``.
 """
 function +(x::AInteger, y::AInteger)
-    x < y ? x : y
+    ⧀(x, y) ? x : y
 end
 
 MSB(n::AInteger) = MSB(unsigned(n))
@@ -276,3 +357,4 @@ function *(x::AInteger, y::AInteger)
 
     product
 end
+

@@ -109,7 +109,9 @@ function calculate_relationship(a::Vector{T}, b::Vector{T}) where T <: AInteger
             individual_b = index
         end
         if value[1] != 0 && value[2] != 0
-            if value[1] + value[2] < closest_relationship[1] + closest_relationship[2]
+            v_add = value[1] + value[2]
+            cr_add = closest_relationship[1] + closest_relationship[2]
+            if v_add < cr_add || (v_add != 0 && cr_add == 0)
                 common_ancestor = index
                 closest_relationship = value
             end

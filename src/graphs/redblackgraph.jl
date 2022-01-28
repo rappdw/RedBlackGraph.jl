@@ -6,41 +6,46 @@ import Graphs.SimpleGraphs: SimpleEdge
 """
     throw_if_invalid_eltype(T)
 
-Internal function, throw a `DomainError` if `T` is not a concrete type `AInteger`.
+Internal function, throw a `DomainError` if `T` is not a concrete type `Integer`.
 Can be used in the constructor of RBGraphs, as Julia's typesystem does not enforce 
 concrete types, which can lead to problems. 
 """
-function throw_if_invalid_eltype(T::Type{<:AInteger})
+function throw_if_invalid_eltype(T::Type{<:Integer})
     if !isconcretetype(T)
         throw(DomainError(T, "Eltype for RBGraph must be concrete type."))
     end
 end
 
-abstract type AbstractRBGraph{T<:AInteger} <: AbstractGraph{T} end
+"""
+    AbstractRBGraph{T, E} <: AbstractGraph{T} where E<:AInteger
+
+AbstractRBGraph is an AbstractGraph with vertices of type T and edges that are AInteger
+"""
+abstract type AbstractRBGraph{V} <: AbstractGraph{V} end
 
 """
     RBGraph{T}
 
 A type representing a RedBlackGraph. 
 """
-mutable struct RBGraph{T <: AInteger} <: AbstractRBGraph{T}
+mutable struct RBGraph{V, E} <: AbstractRBGraph{V}
      # RBGraphs are sparse (<< upper triangular), so representing the graph as a connectivity matrix is 
      # very inefficient, but it provides for a simple implementation
-    graph::Matrix{T}
+    graph::Matrix{E}
     ne::Int
 
-    function RBGraph{T}(
-            graph::Matrix{T},
+    function RBGraph{V, E}(
+            graph::Matrix{E},
             ne::Integer
-    ) where T
+    ) where V where E<:AInteger
 
-        throw_if_invalid_eltype(T)
+        throw_if_invalid_eltype(V)
         return new(graph, ne)
     end
 end
 
-function RBGraph(graph::Matrix{T}, ne) where T<:AInteger
-    return RBGraph{T}(graph, ne)
+function RBGraph(graph::Matrix{E}, ne, ::Type{V} = Int64) where E<:AInteger where V
+    return RBGraph{V, E}(graph, ne)
 end
 
 ne(g::AbstractRBGraph) = g.ne
@@ -50,13 +55,13 @@ vertices(g::AbstractRBGraph) = Base.OneTo(nv(g))
 
 is_directed(::Type{<:RBGraph}) = true
 
-eltype(x::RBGraph{T}) where T = T
+eltype(::RBGraph{V, E}) where V where E<:AInteger = V
 
 edgetype(::RBGraph{T}) where T<:AInteger = SimpleEdge{T}
 
 # ==(g::RBGraph, h::RBGraph) = g.graph == h.graph
 
-function has_edge(g::RBGraph{T}, s::Integer, d::Integer) where T
+function has_edge(g::RBGraph{V,E}, s::Integer, d::Integer) where V where E<:AInteger
     nv = size(g.graph, 1)
 
     if s < nv && d < nv && s != d
@@ -67,12 +72,12 @@ function has_edge(g::RBGraph{T}, s::Integer, d::Integer) where T
     return false
 end
 
-function has_edge(g::RBGraph{T}, e::SimpleEdge) where T<:AInteger
+function has_edge(g::RBGraph{V,E}, e::SimpleEdge) where V where E<:AInteger
     s, d = e.src, e.dst
     return has_edge(g, s, d)
 end
 
-function add_edge!(g::RBGraph{T}, e::SimpleEdge) where T<:AInteger
+function add_edge!(g::RBGraph{V,E}, e::SimpleEdge) where V where E<:AInteger
     s, d = e.src, e.dst
     nv = size(g.graph, 1)
     if s < nv && d < nv && s!= d
@@ -83,7 +88,7 @@ function add_edge!(g::RBGraph{T}, e::SimpleEdge) where T<:AInteger
     return false
 end
 
-function rem_edge!(g::RBGraph{T}, e::SimpleEdge) where T<:AInteger
+function rem_edge!(g::RBGraph{V,E}, e::SimpleEdge) where V where E<:AInteger
     s, d = e.src, e.dst
     if s < nv && d < nv && s!= d
         @inbounds g.graph[s][d] = 0
@@ -97,14 +102,14 @@ function _is_edge(x::AInteger)
     return x > 1 && x != 0
 end
 
-function inneighbors(g::RBGraph{T}, v::Integer) where T<:AInteger
+function inneighbors(g::RBGraph{V,E}, v::Integer) where V where E<:AInteger
     if v <= size(g.graph, 1)
         return @inbounds findall(_is_edge, g.graph[:, v])
     end
     return []
 end
 
-function outneighbors(g::RBGraph{T}, v::Integer) where T<:AInteger
+function outneighbors(g::RBGraph{V,E}, v::Integer) where V where E<:AInteger
     if v <= size(g.graph, 1)
         return @inbounds findall(_is_edge, g.graph[v, :])
     end
@@ -112,11 +117,11 @@ function outneighbors(g::RBGraph{T}, v::Integer) where T<:AInteger
 end
 
 
-function all_neighbors(g::RBGraph{T}, u::Integer) where T<:AInteger
+function all_neighbors(g::RBGraph{V,E}, u::Integer) where V where E<:AInteger
     i, j = 1, 1
     in_nbrs, out_nbrs = inneighbors(g, u), outneighbors(g, u)
     in_len, out_len = length(in_nbrs), length(out_nbrs)
-    union_nbrs = Vector{T}(undef, in_len + out_len)
+    union_nbrs = Vector{V}(undef, in_len + out_len)
     indx = 1
     @inbounds while i <= in_len && j <= out_len
         if in_nbrs[i] < out_nbrs[j]
@@ -165,7 +170,7 @@ g′ = permute(g, p)
 # and the "oldest" vertex in the last position
 ```
 """
-function permute(g::RBGraph{T}, p::Vector{U}; upper_triangular=false) where T<:AInteger where U<:Integer
+function permute(g::RBGraph{V,E}, p::Vector{V}; upper_triangular=false) where V where E<:AInteger
     n = nv(g)
     g′ = zeros(T, n, n)
     for i in 1:n

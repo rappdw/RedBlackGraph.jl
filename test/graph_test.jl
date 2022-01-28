@@ -4,13 +4,14 @@ using Test
 
 @testset "Graph Tests" begin
     r = red_one(1)
-    o = one(r)
 
-    A = [r 2 3 0 0;
-         0 r 0 2 0;
-         0 0 1 0 0;
-         0 0 0 r 0;
-         2 0 0 0 1]
+    A = [
+        r 2 3 0 0;
+        0 r 0 2 0;
+        0 0 1 0 0;
+        0 0 0 r 0;
+        2 0 0 0 1
+        ]
 
     R = RBGraph(A, 4)
     @test nv(R) == 5
@@ -22,4 +23,16 @@ using Test
     v = topological_sort_by_dfs(R)
     @test v == [5, 1, 3, 2, 4]
 
+    A = [
+        r 0 0 2 0 3 0;
+        0 r 0 0 0 0 0;
+        2 0 1 0 0 0 0;
+        0 0 0 r 0 0 0;
+        0 2 0 0 r 0 3;
+        0 0 0 0 0 1 0;
+        0 0 0 0 0 0 1;
+        ]
+    R = RBGraph(A, 5)
+    v = connected_components(R)
+    @test length(v) == 2
 end

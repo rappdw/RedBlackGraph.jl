@@ -172,7 +172,7 @@ g′ = permute(g, p)
 """
 function permute(g::RBGraph{V,E}, p::Vector{V}; upper_triangular=false) where V where E<:AInteger
     n = nv(g)
-    g′ = zeros(T, n, n)
+    g′ = zeros(V, n, n)
     for i in 1:n
         start = upper_triangular ? i : 1
         for j in start:n
